@@ -1,37 +1,39 @@
-const links = [...document.querySelectorAll(".progress a")];
+const stages = [...document.querySelectorAll(".circle")];
 const next = document.querySelector("#next");
-const previous = document.querySelector("#previous");
-let stage = 0;
+const prev = document.querySelector("#prev");
+const progress = document.querySelector("#progress");
+let count = 0;
 
-function activateLink(element) {
-	links.forEach((link, index) => {
-		if (index > stage) {
-			link.classList.remove("active");
-		} else {
-			link.classList.add("active");
-		}
-	});
-
-	element.classList.add("active");
-	if (!element.hasAttribute("data-complete")) {
-		element.setAttribute("data-complete", "");
+function checkButtonState() {
+	if (count === stages.length - 1) {
+		next.setAttribute("disabled", "");
+	} else {
+		next.removeAttribute("disabled");
+	}
+	if (count === 0) {
+		prev.setAttribute("disabled", "");
+	} else {
+		prev.removeAttribute("disabled");
 	}
 }
 
-function buttonHandler(event) {
-	event.preventDefault();
-	if (event.target === next && stage < links.length - 1) stage += 1;
-	if (event.target === previous && stage > 0) stage -= 1;
-
-	links.forEach((link, index) => {
-		if (index === stage) {
-			activateLink(link);
-		}
-	});
+function colorCircles(event) {
+	if (event.target === next && count < stages.length - 1) {
+		count += 1;
+		stages[count].classList.add("active");
+	}
+	if (event.target === prev && count > 0) {
+		stages[count].classList.remove("active");
+		count -= 1;
+	}
 }
 
 function clickHandler(event) {
-	if (event.target.tagName === "BUTTON") buttonHandler(event);
+	event.preventDefault();
+	if (event.target.tagName !== "BUTTON") return;
+	colorCircles(event);
+	checkButtonState();
+	progress.style.width = `${count * 33.333}%`;
 }
 
 document.addEventListener("click", clickHandler);
